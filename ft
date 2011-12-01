@@ -1,0 +1,37 @@
+#!/usr/bin/python
+# -*- coding:Utf-8 -*-
+
+import sys
+import urllib
+import re
+
+from BeautifulSoup import BeautifulSoup
+
+def print_entries(soup):
+    for i in soup.findAll("div", id="newresult"):
+        if re.match("http://video.filestube.com/.*", dict(i.a.attrs)["href"]):
+            continue
+        print
+        print "    ", i.a.renderContents().replace("<b>", "\033[1;37m").replace("</b>", "\033[0m"),
+        print "\033[1;31m%s\033[0m" % i.div.findAll("b")[-1].text if i.div.findAll("b")[-1].text.startswith(".") else "",
+        print "\033[0;35m%s\033[0m" % re.findall('\d+ [MK]B', i.div.text)[0]
+        print "    ", "\033[0;36m%s\033[0m \033[0;33m%s\033[0m" % (dict(i.a.attrs)["href"], i.div.span.b.text if i.div.span.b else "")
+        print
+
+if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        print "Error: give me a query"
+        sys.exit(1)
+
+    query = urllib.quote_plus(" ".join(sys.argv[1:]))
+
+    a = 1
+    soup = BeautifulSoup(urllib.urlopen("http://www.filestube.com/search.html?q=%s&select=All&page=%s" % (query, a)).read())
+    print_entries(soup)
+
+    while soup.find("div", id="pager").findAll("a"):
+        if raw_input("Continue? [O/n] ") == "n":
+            sys.exit(0)
+        a += 1
+        soup = BeautifulSoup(urllib.urlopen("http://www.filestube.com/search.html?q=%s&select=All&page=%s" % (query, a)).read())
+        print_entries(soup)
