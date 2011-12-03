@@ -14,7 +14,7 @@ def print_entries(soup):
         print
         print "    ", i.a.renderContents().replace("<b>", "\033[1;37m").replace("</b>", "\033[0m"),
         print "\033[1;31m%s\033[0m" % i.div.findAll("b")[-1].text if i.div.findAll("b")[-1].text.startswith(".") else "",
-        print "\033[0;35m%s\033[0m" % re.findall('\d+ [MK]B', i.div.text)[0]
+        print "\033[0;35m%s\033[0m" % re.findall('\d+ [GMK]B', i.div.text)[0]
         print "    ", "\033[0;36m%s\033[0m \033[0;33m%s\033[0m" % (dict(i.a.attrs)["href"], i.div.span.b.text if i.div.span.b else "")
         print
 
